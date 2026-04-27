@@ -25,7 +25,7 @@ func sendError(c *echo.Context, code int, msg string, details string) error {
 func CreateSubscription(c *echo.Context) error {
 	var subscriptionReq models.Subscription
 
-	if err := validation.BindAndValidate(c, subscriptionReq, models.TagCreate); err != nil {
+	if err := validation.BindAndValidate(c, &subscriptionReq, models.TagCreate); err != nil {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
 	}
 
