@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"subscription-service-go/internal/models"
-	"subscription-service-go/internal/repository"
 	"subscription-service-go/internal/utils"
 	"subscription-service-go/internal/validation"
 
@@ -26,7 +25,15 @@ func sendError(c *echo.Context, code int, msg string, details string) error {
     })
 }
 
-func CreateSubscription(c *echo.Context) error {
+type SubscriptionHandler struct {
+    db *gorm.DB
+}
+
+func NewSubscriptionHandler(db *gorm.DB) *SubscriptionHandler {
+    return &SubscriptionHandler{db: db}
+}
+
+func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	var subReq models.SubscriptionReq
 
 	if err := validation.BindAndValidate(c, &subReq, models.TagCreate); err != nil {
@@ -41,7 +48,7 @@ func CreateSubscription(c *echo.Context) error {
 		EndDate: utils.ParseToDate(subReq.EndDate),
 	}
 
-	if err := gorm.G[models.Subscription](repository.Db).Create(context.Background(), &sub); err != nil {
+	if err := gorm.G[models.Subscription](h.db).Create(context.Background(), &sub); err != nil {
 		return sendError(c, http.StatusInternalServerError, "Failed to create record", err.Error())
 	}
 
