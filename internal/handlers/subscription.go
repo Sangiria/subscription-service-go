@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"subscription-service-go/internal/models"
+	"subscription-service-go/internal/repository"
 	"subscription-service-go/internal/utils"
 	"subscription-service-go/internal/validation"
 
@@ -26,11 +27,11 @@ func sendError(c *echo.Context, code int, msg string, details string) error {
 }
 
 type SubscriptionHandler struct {
-    db *gorm.DB
+    repo repository.SubscriptionRepository
 }
 
-func NewSubscriptionHandler(db *gorm.DB) *SubscriptionHandler {
-    return &SubscriptionHandler{db: db}
+func NewSubscriptionHandler(repo repository.SubscriptionRepository) *SubscriptionHandler {
+    return &SubscriptionHandler{repo: repo}
 }
 
 func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
@@ -48,12 +49,12 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 		EndDate: utils.ParseToDate(subReq.EndDate),
 	}
 
-	result := h.db.Create(&sub)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
-			return sendError(c, http.StatusConflict, "Record already exist", (result.Error).Error())
+	err := h.repo.Create(&sub)
+	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return sendError(c, http.StatusConflict, "Record already exist", err.Error())
 		}
-		return sendError(c, http.StatusInternalServerError, "Couldn't create record", (result.Error).Error())
+		return sendError(c, http.StatusInternalServerError, "Couldn't create record", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{

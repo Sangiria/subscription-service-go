@@ -1,6 +1,7 @@
 package main
 
 import (
+	"subscription-service-go/internal/database"
 	"subscription-service-go/internal/environment"
 	"subscription-service-go/internal/handlers"
 	"subscription-service-go/internal/repository"
@@ -11,9 +12,11 @@ import (
 
 func main(){
 	environment.LoadEnvVariables()
-	db := repository.GetDBConnection()
+	db := database.InitDB()
+	repo := repository.NewSubscriptionRepository(db)
+	
 	e := echo.New()
-	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(db))
+	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(repo))
 
 	if err := e.Start(":1323"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
