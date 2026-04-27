@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"context"
+	"errors"
 	"net/http"
 	"subscription-service-go/internal/models"
 	"subscription-service-go/internal/utils"
@@ -48,11 +48,15 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 		EndDate: utils.ParseToDate(subReq.EndDate),
 	}
 
-	if err := gorm.G[models.Subscription](h.db).Create(context.Background(), &sub); err != nil {
-		return sendError(c, http.StatusInternalServerError, "Failed to create record", err.Error())
+	result := h.db.Create(&sub)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
+			return sendError(c, http.StatusConflict, "Record already exist", (result.Error).Error())
+		}
+		return sendError(c, http.StatusInternalServerError, "Couldn't create record", (result.Error).Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
+	return c.JSON(http.StatusOK, map[string]any{
 		"subscription": sub,
 	})
 }
