@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-func BindAndValidate(c *echo.Context, req interface{}, tag string) error {
+func BindAndValidate(c *echo.Context, req any, tag string) error {
     if err := c.Bind(req); err != nil {
         return fmt.Errorf("data parsing error")
     }
