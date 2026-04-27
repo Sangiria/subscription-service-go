@@ -1,4 +1,4 @@
-package repository
+package database
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetDBConnection() *gorm.DB {
+func InitDB() *gorm.DB {
 	db, err := gorm.Open(postgres.Open(os.Getenv("GOOSE_DBSTRING")), &gorm.Config{})
 
 	if err != nil {
