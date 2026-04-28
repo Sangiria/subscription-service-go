@@ -13,7 +13,7 @@ import (
 func main(){
 	environment.LoadEnvVariables()
 	db := database.InitDB()
-	repo := repository.NewSubscriptionRepository(db)
+	repo := repository.NewRepository(db)
 	
 	e := echo.New()
 	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(repo))

@@ -27,10 +27,10 @@ func sendError(c *echo.Context, code int, msg string, details string) error {
 }
 
 type SubscriptionHandler struct {
-    repo repository.SubscriptionRepository
+    repo repository.Repository
 }
 
-func NewSubscriptionHandler(repo repository.SubscriptionRepository) *SubscriptionHandler {
+func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
     return &SubscriptionHandler{repo: repo}
 }
 
@@ -60,4 +60,8 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]any{
 		"subscription": sub,
 	})
+}
+
+func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
+	return nil
 }
