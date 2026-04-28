@@ -10,6 +10,7 @@ import (
 type Repository interface {
     Create(sub *models.Subscription) error
     Get(id string) (*models.Subscription, error)
+    List(limit int, offest int) []*models.Subscription
 }
 
 type subscriptionRepo struct {
@@ -31,4 +32,11 @@ func (r *subscriptionRepo) Get(id string) (*models.Subscription, error) {
     }
 
     return &sub, err
+}
+
+func (r *subscriptionRepo) List(limit int, offset int) []*models.Subscription {
+    var subs []*models.Subscription
+    r.db.Limit(limit).Offset(offset).Find(subs)
+
+    return subs
 }

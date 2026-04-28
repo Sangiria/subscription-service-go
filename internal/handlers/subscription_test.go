@@ -24,10 +24,8 @@ func (m *MockRepository) Create(sub *models.Subscription) error {
     return args.Error(0)
 }
 
-func (m *MockRepository) Get(id string) (*models.Subscription, error) {
-    //TODO: implement mock for Get when unit tests are needed
-    return nil, nil
-}
+func (m *MockRepository) Get(id string) (*models.Subscription, error)
+func (m *MockRepository) List(limit int, offest int) []*models.Subscription
 
 func TestCreateSubscription(t *testing.T) {
     e := echo.New()
