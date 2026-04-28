@@ -8,6 +8,7 @@ import (
 	"subscription-service-go/internal/utils"
 	"subscription-service-go/internal/validation"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v5"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,7 @@ type ApiError struct {
 	Details string	`json:"details,omitzero"`
 }
 
-func sendError(c *echo.Context, code int, msg string, details string) error {
+func sendJSONError(c *echo.Context, code int, msg string, details string) error {
     return c.JSON(code, ApiError{
         Status:  code,
         Message: msg,
@@ -38,7 +39,7 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	var subReq models.SubscriptionReq
 
 	if err := validation.BindAndValidate(c, &subReq, models.TagCreate); err != nil {
-		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return sendJSONError(c, http.StatusBadRequest, "Validation failed", err.Error())
 	}
 
 	sub := models.Subscription{
@@ -52,9 +53,9 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	err := h.repo.Create(&sub)
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return sendError(c, http.StatusConflict, "Record already exist", err.Error())
+			return sendJSONError(c, http.StatusConflict, "This subscription already exist", err.Error())
 		}
-		return sendError(c, http.StatusInternalServerError, "Couldn't create record", err.Error())
+		return sendJSONError(c, http.StatusInternalServerError, "Couldn't create subscription record", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
@@ -63,5 +64,21 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 }
 
 func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
-	return nil
+	subId := c.Param("id")
+	sub, err := h.repo.Get(subId)
+
+	if _, err := uuid.Parse(subId); err != nil {
+        return sendJSONError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+    }
+	
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return sendJSONError(c, http.StatusNotFound, "This subscription doesn't exist", err.Error())
+		}
+		return sendJSONError(c, http.StatusInternalServerError, "Error getting subscription record", err.Error())
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"subscription": sub,
+	})
 }
