@@ -15,11 +15,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type MockSubscriptionRepository struct {
+type MockRepository struct {
     mock.Mock
 }
 
-func (m *MockSubscriptionRepository) Create(sub *models.Subscription) error {
+func (m *MockRepository) Create(sub *models.Subscription) error {
     args := m.Called(sub)
     return args.Error(0)
 }
@@ -32,7 +32,7 @@ func TestCreateSubscription(t *testing.T) {
     tests := []struct {
         name           string
         input          models.SubscriptionReq
-        setupMock      func(m *MockSubscriptionRepository)
+        setupMock      func(m *MockRepository)
         expectedStatus int
         expectedBody   string
     }{
@@ -42,7 +42,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
-            setupMock: func(m *MockSubscriptionRepository) {
+            setupMock: func(m *MockRepository) {
                 m.On("Create", mock.Anything).Return(nil)
             },
             expectedStatus: http.StatusOK,
@@ -54,7 +54,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "Netflix", Price: -1, 
                 UserId: testUUID, StartDate: "07-2023",
             },
-            setupMock:      func(m *MockSubscriptionRepository) {},
+            setupMock:      func(m *MockRepository) {},
             expectedStatus: http.StatusBadRequest,
             expectedBody:   "Validation failed",
         },
@@ -64,7 +64,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
-            setupMock:      func(m *MockSubscriptionRepository) {},
+            setupMock:      func(m *MockRepository) {},
             expectedStatus: http.StatusBadRequest,
             expectedBody:   "Validation failed",
         },
@@ -74,7 +74,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "Netflix", Price: 300, 
                 UserId: "string", StartDate: "07-2023",
             },
-            setupMock:      func(m *MockSubscriptionRepository) {},
+            setupMock:      func(m *MockRepository) {},
             expectedStatus: http.StatusBadRequest,
             expectedBody:   "Validation failed",
         },
@@ -84,7 +84,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "0791832023",
             },
-            setupMock:      func(m *MockSubscriptionRepository) {},
+            setupMock:      func(m *MockRepository) {},
             expectedStatus: http.StatusBadRequest,
             expectedBody:   "Validation failed",
         },
@@ -94,7 +94,7 @@ func TestCreateSubscription(t *testing.T) {
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
-            setupMock: func(m *MockSubscriptionRepository) {
+            setupMock: func(m *MockRepository) {
                 m.On("Create", mock.Anything).Return(gorm.ErrDuplicatedKey)
             },
             expectedStatus: http.StatusConflict,
@@ -104,7 +104,7 @@ func TestCreateSubscription(t *testing.T) {
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            mockRepo := new(MockSubscriptionRepository)
+            mockRepo := new(MockRepository)
             tt.setupMock(mockRepo)
             h := NewSubscriptionHandler(mockRepo)
 
