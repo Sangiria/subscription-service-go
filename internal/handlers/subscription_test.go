@@ -33,6 +33,7 @@ func (m *MockRepository) Update(id string, fields map[string]any) (*models.Subsc
 func (m *MockRepository) Get(id string) (*models.Subscription, error) { return nil, nil }
 func (m *MockRepository) List(limit int, offest int) ([]models.Subscription, error) { return nil, nil }
 func (m *MockRepository) Delete(id string) error { return nil }
+func (m *MockRepository) Sum (sumReq models.SumSubscriptionPrice) (int, error)
 
 func TestUpdateSubscription(t *testing.T) {
     for _, tt := range UpdateSubscriptionTests {

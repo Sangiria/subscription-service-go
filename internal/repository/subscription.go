@@ -2,6 +2,7 @@ package repository
 
 import (
 	"subscription-service-go/internal/models"
+	"subscription-service-go/internal/utils"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -13,6 +14,7 @@ type Repository interface {
     List(limit int, offest int) ([]models.Subscription, error)
     Delete(id string) error
     Update(id string, fields map[string]any) (*models.Subscription, error)
+    Sum (sumReq models.SumSubscriptionPrice) (int, error)
 }
 
 type subscriptionRepo struct {
@@ -74,4 +76,28 @@ func (r *subscriptionRepo) Update(id string, fields map[string]any) (*models.Sub
     }
 
     return &sub, nil
+}
+
+func (r *subscriptionRepo) Sum(sumReq models.SumSubscriptionPrice) (int, error) {
+    var total int
+    query := r.db.Model(&models.Subscription{}).Where("user_id = ?", sumReq.UserID)
+
+    if sumReq.Name != "" {
+        query = query.Where("service_name = ?", sumReq.Name)
+    }
+
+    startDateTime, endDateTime := utils.ParseToDate(sumReq.StartDate), utils.ParseToDate(sumReq.EndDate)
+
+    if !startDateTime.IsZero() {
+        query = query.Where("start_date >= ?", startDateTime)
+    }
+    if !endDateTime.IsZero() {
+        query = query.Where("start_date <= ?", endDateTime)
+    }
+
+    if err := query.Select("SUM(price)").Scan(&total).Error; err != nil {
+        return 0, err
+    }
+
+    return total, nil
 }
