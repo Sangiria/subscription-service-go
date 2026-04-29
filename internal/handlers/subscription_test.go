@@ -35,14 +35,14 @@ func TestCreateSubscription(t *testing.T) {
     
     tests := []struct {
         name           string
-        input          models.SubscriptionReq
+        input          models.SubscriptionCreateReq
         setupMock      func(m *MockRepository)
         expectedStatus int
         expectedBody   string
     }{
         {
             name: "success",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
@@ -54,7 +54,7 @@ func TestCreateSubscription(t *testing.T) {
         },
         {
             name: "validation failed - negative price",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "Netflix", Price: -1, 
                 UserId: testUUID, StartDate: "07-2023",
             },
@@ -64,7 +64,7 @@ func TestCreateSubscription(t *testing.T) {
         },
 		{
             name: "validation failed - empty name",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
@@ -74,7 +74,7 @@ func TestCreateSubscription(t *testing.T) {
         },
 		{
             name: "validation failed - invalid uuid",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "Netflix", Price: 300, 
                 UserId: "string", StartDate: "07-2023",
             },
@@ -84,7 +84,7 @@ func TestCreateSubscription(t *testing.T) {
         },
 		{
             name: "validation failed - invalid date",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "0791832023",
             },
@@ -94,7 +94,7 @@ func TestCreateSubscription(t *testing.T) {
         },
         {
             name: "conflict",
-            input: models.SubscriptionReq{
+            input: models.SubscriptionCreateReq{
                 ServiceName: "Netflix", Price: 300, 
                 UserId: testUUID, StartDate: "07-2023",
             },
