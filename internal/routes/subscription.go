@@ -11,4 +11,5 @@ func InitSubscriptionRoutes(e *echo.Echo, h *handlers.SubscriptionHandler) {
 	e.GET("/subscriptions/:id", h.GetSubscription)
 	e.GET("/subscriptions", h.ListSubscriptions)
 	e.DELETE("/subscriptions/:id", h.DeleteSubscriptions)
+	e.PATCH("/subscriptions/:id", h.UpdateSubscriptions)
 }

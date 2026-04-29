@@ -36,7 +36,7 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	var subReq models.SubscriptionCreateReq
 
-	if err := c.Bind(subReq); err != nil {
+	if err := c.Bind(&subReq); err != nil {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
     }
 
@@ -113,4 +113,36 @@ func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
+	subId := c.Param("id")
+	if _, err := uuid.Parse(subId); err != nil {
+        return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+    }
+
+	var subReq models.SubscriptionUpdateReq
+	if err := c.Bind(&subReq); err != nil {
+		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+    }
+
+	fields := subReq.ToMap()
+	if len(fields) == 0 {
+		return sendError(c, http.StatusBadRequest, "Update failed", "No valid fields provided for update")
+	}
+	
+	if err := validation.Validate(&subReq, utils.Ptr(models.TagUpdate)); err != nil {
+		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+	}
+
+	sub, err := h.repo.Update(subId, fields)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return sendError(c, http.StatusNotFound, "This subscription doesn't exist", err.Error())
+		}
+
+		return sendError(c, http.StatusInternalServerError, "Error updating subscription record", err.Error())
+	}
+
+	return c.JSON(http.StatusOK, sub)
 }
