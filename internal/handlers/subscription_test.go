@@ -22,34 +22,65 @@ func (m *MockRepository) Create(sub *models.Subscription) error {
     return args.Error(0)
 }
 
+func (m *MockRepository) Update(id string, fields map[string]any) (*models.Subscription, error) { 
+    args := m.Called(id, fields)
+    if args.Get(0) == nil {
+        return nil, args.Error(1)
+    }
+    return args.Get(0).(*models.Subscription), args.Error(1)
+}
+
 func (m *MockRepository) Get(id string) (*models.Subscription, error) { return nil, nil }
 func (m *MockRepository) List(limit int, offest int) ([]models.Subscription, error) { return nil, nil }
 func (m *MockRepository) Delete(id string) error { return nil }
-func (m *MockRepository) Update(id string, fields map[string]any) (*models.Subscription, error) { return nil, nil }
 
-func TestCreateSubscription(t *testing.T) {
-    e := echo.New()
-
-    for _, tt := range CreateSubscriptionTests {
+func TestUpdateSubscription(t *testing.T) {
+    for _, tt := range UpdateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
+            e := echo.New()
             mockRepo := new(MockRepository)
             tt.setupMock(mockRepo)
             h := NewSubscriptionHandler(mockRepo)
 
+            e.PATCH("/subscriptions/:id", h.UpdateSubscriptions)
+
             body, _ := json.Marshal(tt.input)
-            req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(body))
+            
+            targetURL := "/subscriptions/" + tt.paramID 
+            
+            req := httptest.NewRequest(http.MethodPatch, targetURL, bytes.NewReader(body))
             req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
             rec := httptest.NewRecorder()
-            c := e.NewContext(req, rec)
 
-            err := h.CreateSubscription(c)
-            if err != nil {
-                e.HTTPErrorHandler(c, err)
-            }
+            e.ServeHTTP(rec, req)
 
             assert.Equal(t, tt.expectedStatus, rec.Code)
             assert.Contains(t, rec.Body.String(), tt.expectedBody)
+            mockRepo.AssertExpectations(t)
+        })
+    }
+}
 
+func TestCreateSubscription(t *testing.T) {
+    for _, tt := range CreateSubscriptionTests {
+        t.Run(tt.name, func(t *testing.T) {
+            e := echo.New()
+            mockRepo := new(MockRepository)
+            tt.setupMock(mockRepo)
+            h := NewSubscriptionHandler(mockRepo)
+
+            e.POST("/subscriptions", h.CreateSubscription)
+
+            body, _ := json.Marshal(tt.input)
+
+            req := httptest.NewRequest(http.MethodPost, "/subscriptions", bytes.NewReader(body))
+            req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+            rec := httptest.NewRecorder()
+
+            e.ServeHTTP(rec, req)
+
+            assert.Equal(t, tt.expectedStatus, rec.Code)
+            assert.Contains(t, rec.Body.String(), tt.expectedBody)
             mockRepo.AssertExpectations(t)
         })
     }

@@ -35,7 +35,7 @@ var UpdateSubscriptionTests = []UpdateTest{
         input: models.SubscriptionUpdateReq{ServiceName: new("Netflix Premium"), Price: new(500)},
         setupMock: func(m *MockRepository) {
             m.On("Update", testUUID, mock.MatchedBy(func(fields map[string]any) bool {
-                return fields["service_name"] == "Netflix Premium" && fields["price"] == float64(500)
+                return fields["service_name"] == "Netflix Premium" && fields["price"] == 500
             })).Return(&models.Subscription{ServiceName: "Netflix Premium"}, nil)
         },
         expectedStatus: http.StatusOK,
