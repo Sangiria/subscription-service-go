@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+const (
+	TagCreate = "create"
+	TagUpdate = "update"
+)
+
 type SubscriptionCreateReq struct {
 	ServiceName string 		`json:"service_name" create:"required" update:"omitzero"`
 	Price		int			`json:"price" create:"required,gt=-1" update:"omitzero,gt=-1"`
@@ -20,6 +25,13 @@ type SubscriptionUpdateReq struct {
 	EndDate		*string		`json:"end_date,omitzero" update:"omitzero,datetime=01-2006"`
 }
 
+type SumSubscriptionPrice struct {
+	UserID  	string		`validate:"required,uuid"`
+	Name    	string     	`validate:"required"`
+	StartDate   string 		`validate:"omitzero,datetime=01-2006"`
+	EndDate     string 		`validate:"omitzero,datetime=01-2006"`
+}
+
 type Subscription struct {
 	Id			string			`json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	ServiceName string 			`json:"service_name"`
@@ -30,14 +42,9 @@ type Subscription struct {
 }
 
 type ListParams struct {
-	Limit  int `query:"limit" validate:"gte=-2,lte=100"`
-	Offset int `query:"offset" validate:"gte=-2"`
+	Limit  int `validate:"gte=0,lte=100"`
+	Offset int `validate:"gte=0"`
 }
-
-const (
-    TagCreate = "create"
-    TagUpdate = "update"
-)
 
 func (req *SubscriptionUpdateReq) ToMap() map[string]any {
     updateData := make(map[string]any)
