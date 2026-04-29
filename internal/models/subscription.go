@@ -27,7 +27,7 @@ type SubscriptionUpdateReq struct {
 
 type SumSubscriptionPrice struct {
 	UserID  	string		`validate:"required,uuid"`
-	Name    	string     	`validate:"required"`
+	Name    	string     	`validate:"omitzero"`
 	StartDate   string 		`validate:"omitzero,datetime=01-2006"`
 	EndDate     string 		`validate:"omitzero,datetime=01-2006"`
 }
