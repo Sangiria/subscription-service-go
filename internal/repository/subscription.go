@@ -9,7 +9,7 @@ import (
 type Repository interface {
     Create(sub *models.Subscription) error
     Get(id string) (*models.Subscription, error)
-    List(limit int, offest int) ([]*models.Subscription, error)
+    List(limit int, offest int) ([]models.Subscription, error)
 }
 
 type subscriptionRepo struct {
@@ -35,10 +35,10 @@ func (r *subscriptionRepo) Get(id string) (*models.Subscription, error) {
     return sub, err
 }
 
-func (r *subscriptionRepo) List(limit int, offset int) ([]*models.Subscription, error) {
-    var subs []*models.Subscription
+func (r *subscriptionRepo) List(limit int, offset int) ([]models.Subscription, error) {
+    var subs []models.Subscription
 
-    err := r.db.Limit(limit).Offset(offset).Find(subs).Error
+    err := r.db.Limit(limit).Offset(offset).Find(&subs).Error
     if err != nil {
         return nil, err
     }

@@ -2,9 +2,7 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"strings"
 	"subscription-service-go/internal/models"
 	"subscription-service-go/internal/repository"
 	"subscription-service-go/internal/utils"
@@ -85,21 +83,8 @@ func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
-func getIntParam(c *echo.Context, name string) (int, error) {
-    val, err := echo.QueryParam[int](c, name)
-    if err != nil {
-        return 0, fmt.Errorf("%s param should be a number: %w", name, err)
-    }
-    return val, nil
-}
-
 func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
-	limit, err := getIntParam(c, "limit")
-	offset, err2 := getIntParam(c, "offset")
-
-	if err != nil || err2 != nil {
-    	return sendError(c, http.StatusBadRequest, "Invalid parameters", strings.Join([]string{err.Error(), err2.Error()}, "; "))
-	}
+	limit, offset := utils.ToInt(c.QueryParam("limit"), -1), utils.ToInt(c.QueryParam("offset"), -1)
 
 	if err := validation.Validate(&models.ListParams{Limit: limit, Offset: offset}, nil); err != nil {
 		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())

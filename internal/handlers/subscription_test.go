@@ -25,7 +25,7 @@ func (m *MockRepository) Create(sub *models.Subscription) error {
 }
 
 func (m *MockRepository) Get(id string) (*models.Subscription, error)
-func (m *MockRepository) List(limit int, offest int) ([]*models.Subscription, error)
+func (m *MockRepository) List(limit int, offest int) ([]models.Subscription, error)
 
 func TestCreateSubscription(t *testing.T) {
     e := echo.New()
