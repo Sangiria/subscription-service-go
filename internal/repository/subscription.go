@@ -10,6 +10,7 @@ type Repository interface {
     Create(sub *models.Subscription) error
     Get(id string) (*models.Subscription, error)
     List(limit int, offest int) ([]models.Subscription, error)
+    Delete(id string) error
 }
 
 type subscriptionRepo struct {
@@ -44,4 +45,17 @@ func (r *subscriptionRepo) List(limit int, offset int) ([]models.Subscription, e
     }
 
     return subs, nil
+}
+
+func (r *subscriptionRepo) Delete(id string) error {
+    result := r.db.Delete(models.Subscription{}, "id = ?", id)
+    if result.Error != nil {
+        return result.Error
+    }
+
+    if result.RowsAffected == 0 {
+        return gorm.ErrRecordNotFound
+    }
+
+    return nil
 }
