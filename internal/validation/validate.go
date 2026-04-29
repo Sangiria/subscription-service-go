@@ -5,18 +5,15 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v5"
 )
 
-func BindAndValidate(c *echo.Context, req any, tag string) error {
-    if err := c.Bind(req); err != nil {
-        return fmt.Errorf("data parsing error")
+func Validate(st any, tag *string) error {
+    v := validator.New()
+    if tag != nil {
+        v.SetTagName(*tag)
     }
 
-    v := validator.New()
-    v.SetTagName(tag)
-
-    err := v.Struct(req)
+    err := v.Struct(st)
     if err == nil {
         return nil
     }

@@ -19,6 +19,11 @@ type Subscription struct {
 	EndDate		*time.Time		`json:"end_date,omitzero"`
 }
 
+type ListParams struct {
+	Limit  int `query:"limit" validate:"gte=-2,lte=100"`
+	Offset int `query:"offset" validate:"gte=-2"`
+}
+
 const (
     TagCreate = "create"
     TagUpdate = "update"
