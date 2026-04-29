@@ -67,11 +67,11 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 
 func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 	subId := c.Param("id")
-	sub, err := h.repo.Get(subId)
-
 	if _, err := uuid.Parse(subId); err != nil {
-        return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
     }
+
+	sub, err := h.repo.Get(subId)
 	
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -96,4 +96,21 @@ func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, subs)
+}
+
+func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
+	subId := c.Param("id")
+	if _, err := uuid.Parse(subId); err != nil {
+        return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+    }
+
+	if err := h.repo.Delete(subId); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return sendError(c, http.StatusNotFound, "This subscription doesn't exist", err.Error())
+		}
+
+		return sendError(c, http.StatusInternalServerError, "Error deleting subscription record", err.Error())
+	}
+
+	return c.NoContent(http.StatusOK)
 }
