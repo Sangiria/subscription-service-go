@@ -26,14 +26,14 @@ func (r *subscriptionRepo) Create(sub *models.Subscription) error {
 }
 
 func (r *subscriptionRepo) Get(id string) (*models.Subscription, error) {
-    var sub *models.Subscription
+    var sub models.Subscription
 
-    err := r.db.Where("id = ?", id).First(sub).Error
+    err := r.db.Where("id = ?", id).First(&sub).Error
     if err != nil {
         return nil, err
     }
 
-    return sub, err
+    return &sub, err
 }
 
 func (r *subscriptionRepo) List(limit int, offset int) ([]models.Subscription, error) {
