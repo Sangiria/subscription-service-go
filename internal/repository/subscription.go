@@ -4,6 +4,7 @@ import (
 	"subscription-service-go/internal/models"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Repository interface {
@@ -11,6 +12,7 @@ type Repository interface {
     Get(id string) (*models.Subscription, error)
     List(limit int, offest int) ([]models.Subscription, error)
     Delete(id string) error
+    Update(id string, fields map[string]any) (*models.Subscription, error)
 }
 
 type subscriptionRepo struct {
@@ -58,4 +60,18 @@ func (r *subscriptionRepo) Delete(id string) error {
     }
 
     return nil
+}
+
+func (r *subscriptionRepo) Update(id string, fields map[string]any) (*models.Subscription, error) {
+    var sub models.Subscription
+    result := r.db.Model(&sub).Clauses(clause.Returning{}).Where("id = ?", id).Updates(fields)
+    if result.Error != nil {
+        return &sub, result.Error
+    }
+
+    if result.RowsAffected == 0 {
+        return &sub, gorm.ErrRecordNotFound
+    }
+
+    return &sub, nil
 }

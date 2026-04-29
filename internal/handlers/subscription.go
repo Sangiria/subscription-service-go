@@ -13,13 +13,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type ApiError struct {
+type apiError struct {
     Message string 	`json:"message"`
 	Details string	`json:"details,omitzero"`
 }
 
 func sendError(c *echo.Context, code int, msg string, details string) error {
-    return c.JSON(code, ApiError{
+    return c.JSON(code, apiError{
         Message: msg,
 		Details: details,
     })
