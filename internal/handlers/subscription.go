@@ -34,7 +34,7 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 }
 
 func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
-	var subReq models.SubscriptionReq
+	var subReq models.SubscriptionCreateReq
 
 	if err := c.Bind(subReq); err != nil {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
