@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"subscription-service-go/internal/models"
 
 	"gorm.io/gorm"
@@ -10,7 +9,7 @@ import (
 type Repository interface {
     Create(sub *models.Subscription) error
     Get(id string) (*models.Subscription, error)
-    List(limit int, offest int) []*models.Subscription
+    List(limit int, offest int) ([]*models.Subscription, error)
 }
 
 type subscriptionRepo struct {
@@ -22,21 +21,27 @@ func NewRepository(db *gorm.DB) Repository {
 }
 
 func (r *subscriptionRepo) Create(sub *models.Subscription) error {
-    return gorm.G[models.Subscription](r.db).Create(context.Background(), sub)
+    return r.db.Create(sub).Error
 }
 
 func (r *subscriptionRepo) Get(id string) (*models.Subscription, error) {
-    sub, err := gorm.G[models.Subscription](r.db).Where("id = ?", id).First(context.Background())
+    var sub *models.Subscription
+
+    err := r.db.Where("id = ?", id).First(sub).Error
     if err != nil {
         return nil, err
     }
 
-    return &sub, err
+    return sub, err
 }
 
-func (r *subscriptionRepo) List(limit int, offset int) []*models.Subscription {
+func (r *subscriptionRepo) List(limit int, offset int) ([]*models.Subscription, error) {
     var subs []*models.Subscription
-    r.db.Limit(limit).Offset(offset).Find(subs)
 
-    return subs
+    err := r.db.Limit(limit).Offset(offset).Find(subs).Error
+    if err != nil {
+        return nil, err
+    }
+
+    return subs, nil
 }
