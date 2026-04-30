@@ -4,31 +4,11 @@ import (
 	"net/http"
 	"subscription-service-go/internal/models"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
-//TODO: refactor
-type CreateTest struct {
-	name           string
-    input          models.SubscriptionCreateReq
-    setupMock      func(m *MockRepository)
-    expectedStatus int
-    expectedBody   string
-}
-
-//TODO: refactor
-type UpdateTest struct {
-	name           	string
-	paramID			string
-    input          	models.SubscriptionUpdateReq
-    setupMock      	func(m *MockRepository)
-    expectedStatus 	int
-    expectedBody   	string
-}
-
-var testUUID = uuid.New().String()
+const testUUID = "550e8400-e29b-41d4-a716-446655440000"
 
 var SumSubscriprionPriceTests = []struct {
     name string
@@ -90,8 +70,14 @@ var SumSubscriprionPriceTests = []struct {
     },
 }
 
-//TODO: refactor
-var UpdateSubscriptionTests = []UpdateTest{
+var UpdateSubscriptionTests = []struct{
+    name           	string
+	paramID			string
+    input          	models.SubscriptionUpdateReq
+    setupMock      	func(m *MockRepository)
+    expectedStatus 	int
+    expectedBody   	string
+}{
 	{
         name: "success",
         paramID: testUUID,
@@ -142,7 +128,13 @@ var UpdateSubscriptionTests = []UpdateTest{
     },
 }
 
-var CreateSubscriptionTests = []CreateTest{
+var CreateSubscriptionTests = []struct{
+    name           string
+    input          models.SubscriptionCreateReq
+    setupMock      func(m *MockRepository)
+    expectedStatus int
+    expectedBody   string
+}{
 	{
         name: "success",
         input: models.SubscriptionCreateReq{
@@ -163,7 +155,7 @@ var CreateSubscriptionTests = []CreateTest{
         },
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Validation failed",
+        expectedBody: "Invalid parameters",
     },
 	{
         name: "empty name",
@@ -173,7 +165,7 @@ var CreateSubscriptionTests = []CreateTest{
         },
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Validation failed",
+        expectedBody: "Invalid parameters",
     },
 	{
         name: "invalid uuid format",
@@ -183,7 +175,7 @@ var CreateSubscriptionTests = []CreateTest{
         },
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Validation failed",
+        expectedBody: "Invalid parameters",
     },
 	{
         name: "invalid date format",
@@ -193,7 +185,7 @@ var CreateSubscriptionTests = []CreateTest{
         },
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Validation failed",
+        expectedBody: "Invalid parameters",
     },
     {
         name: "conflict",
@@ -217,6 +209,6 @@ var CreateSubscriptionTests = []CreateTest{
             m.On("Create", mock.Anything).Return(gorm.ErrInvalidDB)
         },
         expectedStatus: http.StatusInternalServerError,
-        expectedBody: "Couldn't create subscription record",
+        expectedBody: "Error creating subscription record",
     },
 }

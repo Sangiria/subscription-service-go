@@ -37,9 +37,15 @@ func (m *MockRepository) Sum(sumReq models.SumSubscriptionPriceParams) (int, err
     return args.Int(0), args.Error(1) 
 }
 
-func (m *MockRepository) Get(id string) (*models.Subscription, error) { return nil, nil }
-func (m *MockRepository) List(listReq models.ListParams) ([]models.Subscription, error) { return nil, nil }
-func (m *MockRepository) Delete(id string) error { return nil }
+func (m *MockRepository) Get(id string) (*models.Subscription, error) { 
+    panic("mock method Get not implemented")
+}
+func (m *MockRepository) List(listReq models.ListParams) ([]models.Subscription, error) {
+    panic("mock method List not implemented")
+}
+func (m *MockRepository) Delete(id string) error {
+    panic("mock method Delete not implemented")
+}
 
 func setupHandlerTest(setupMock func(m *MockRepository)) (*echo.Echo, *MockRepository, *httptest.ResponseRecorder) {
     e := echo.New()
