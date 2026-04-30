@@ -42,8 +42,8 @@ type Subscription struct {
 }
 
 type ListParams struct {
-	Limit  int `validate:"gte=0,lte=100"`
-	Offset int `validate:"gte=0"`
+	Limit  int `validate:"gte=-1,lte=100"`
+	Offset int `validate:"gte=-1"`
 }
 
 func (req *SubscriptionUpdateReq) ToMap() map[string]any {

@@ -5,10 +5,13 @@ import "time"
 const layout = "01-2006"
 
 func ParseToDate(s string) *time.Time {
-	var t time.Time
+	if s == "" {
+		return nil
+	}
 
-	if s != "" {
-		t, _ = time.Parse(layout, s)
+	t, err := time.Parse(layout, s)
+	if err != nil {
+		return nil
 	}
 
 	return &t
