@@ -7,9 +7,12 @@ import (
 )
 
 func InitSubscriptionRoutes(e *echo.Echo, h *handlers.SubscriptionHandler) {
-	e.POST("/subscriptions", h.CreateSubscription)
-	e.GET("/subscriptions/:id", h.GetSubscription)
-	e.GET("/subscriptions", h.ListSubscriptions)
-	e.DELETE("/subscriptions/:id", h.DeleteSubscriptions)
-	e.PATCH("/subscriptions/:id", h.UpdateSubscriptions)
+	g := e.Group("/subscriptions")
+
+	g.POST("", h.CreateSubscription)
+	g.GET("", h.ListSubscriptions)
+	g.GET("/:id", h.GetSubscription)
+	g.DELETE("/:id", h.DeleteSubscriptions)
+	g.PATCH("/:id", h.UpdateSubscriptions)
+	g.GET("/sum", h.SumSubscriptionsPrice)
 }

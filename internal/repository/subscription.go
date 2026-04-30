@@ -82,17 +82,17 @@ func (r *subscriptionRepo) Sum(sumReq models.SumSubscriptionPrice) (int, error) 
     var total int
     query := r.db.Model(&models.Subscription{}).Where("user_id = ?", sumReq.UserID)
 
-    if sumReq.Name != "" {
-        query = query.Where("service_name = ?", sumReq.Name)
+    if sumReq.ServiceName != "" {
+        query = query.Where("service_name = ?", sumReq.ServiceName)
     }
 
     startDateTime, endDateTime := utils.ParseToDate(sumReq.StartDate), utils.ParseToDate(sumReq.EndDate)
 
-    if !startDateTime.IsZero() {
-        query = query.Where("start_date >= ?", startDateTime)
+    if startDateTime != nil {
+        query = query.Where("start_date >= ?", *startDateTime)
     }
-    if !endDateTime.IsZero() {
-        query = query.Where("start_date <= ?", endDateTime)
+    if endDateTime != nil {
+        query = query.Where("start_date <= ?", *endDateTime)
     }
 
     if err := query.Select("SUM(price)").Scan(&total).Error; err != nil {
