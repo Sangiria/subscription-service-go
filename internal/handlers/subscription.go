@@ -87,13 +87,16 @@ func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 //TODO: add user_id query_param
 
 func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
-	limit, offset := utils.ToInt(c.QueryParam("limit"), -1), utils.ToInt(c.QueryParam("offset"), -1)
+	var subReq models.ListParams
+	if err := c.Bind(&subReq); err != nil {
+        return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
+    }
 
-	if err := validation.Validate(&models.ListParams{Limit: limit, Offset: offset}, nil); err != nil {
+	if err := validation.Validate(&subReq, nil); err != nil {
 		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
 	}
 
-	subs, err := h.repo.List(limit, offset)
+	subs, err := h.repo.List(subReq)
 	if err != nil {
 		return sendError(c, http.StatusInternalServerError, "Error getting subscription records", err.Error())
 	}
@@ -151,7 +154,7 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 }
 
 func (h *SubscriptionHandler) SumSubscriptionsPrice(c *echo.Context) error {
-	var subReq models.SumSubscriptionPrice
+	var subReq models.SumSubscriptionPriceParams
 	if err := c.Bind(&subReq); err != nil {
 		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
     }

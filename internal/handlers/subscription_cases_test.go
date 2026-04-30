@@ -32,21 +32,21 @@ var testUUID = uuid.New().String()
 
 var SumSubscriprionPriceTests = []struct {
     name string
-    input models.SumSubscriptionPrice
+    input models.SumSubscriptionPriceParams
     setupMock func(m *MockRepository)
     expectedStatus int
     expectedBody string
 }{
     {
         name: "success",
-        input: models.SumSubscriptionPrice{
+        input: models.SumSubscriptionPriceParams{
             UserID: testUUID,
             ServiceName: "Netflix",
 			StartDate:   "01-2026",
 			EndDate:     "12-2026",
         },
         setupMock: func(m *MockRepository) {
-			m.On("Sum", mock.MatchedBy(func(req models.SumSubscriptionPrice) bool {
+			m.On("Sum", mock.MatchedBy(func(req models.SumSubscriptionPriceParams) bool {
 				return req.UserID == testUUID && 
                 req.StartDate == "01-2026" && 
                 req.ServiceName == "Netflix"
@@ -57,7 +57,7 @@ var SumSubscriprionPriceTests = []struct {
     },
     {
         name: "invalid date format",
-		input: models.SumSubscriptionPrice{
+		input: models.SumSubscriptionPriceParams{
 			UserID: testUUID,
 			StartDate: "2026-01",
 		},
@@ -67,7 +67,7 @@ var SumSubscriprionPriceTests = []struct {
     },
     {
         name: "user_id missing",
-		input: models.SumSubscriptionPrice{
+		input: models.SumSubscriptionPriceParams{
 			ServiceName: "Spotify",
 		},
 		setupMock: func(m *MockRepository) {},
@@ -76,7 +76,7 @@ var SumSubscriprionPriceTests = []struct {
     },
     {
         name: "internal server error",
-        input: models.SumSubscriptionPrice{
+        input: models.SumSubscriptionPriceParams{
             UserID: testUUID,
             ServiceName: "Netflix",
 			StartDate: "01-2026",

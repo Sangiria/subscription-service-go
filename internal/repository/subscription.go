@@ -11,10 +11,10 @@ import (
 type Repository interface {
     Create(sub *models.Subscription) error
     Get(id string) (*models.Subscription, error)
-    List(limit int, offest int) ([]models.Subscription, error)
+    List(listReq models.ListParams) ([]models.Subscription, error)
     Delete(id string) error
     Update(id string, fields map[string]any) (*models.Subscription, error)
-    Sum (sumReq models.SumSubscriptionPrice) (int, error)
+    Sum (sumReq models.SumSubscriptionPriceParams) (int, error)
 }
 
 type subscriptionRepo struct {
@@ -40,10 +40,25 @@ func (r *subscriptionRepo) Get(id string) (*models.Subscription, error) {
     return &sub, err
 }
 
-func (r *subscriptionRepo) List(limit int, offset int) ([]models.Subscription, error) {
-    var subs []models.Subscription
+func (r *subscriptionRepo) List(listReq models.ListParams) ([]models.Subscription, error) {
+    var (
+        subs []models.Subscription
+        limit = -1
+        offset = -1
+        query = r.db.Model(&models.Subscription{})
+    )
 
-    err := r.db.Limit(limit).Offset(offset).Find(&subs).Error
+    if listReq.Limit != nil {
+        limit = *listReq.Limit
+    }
+    if listReq.Offset != nil {
+        offset = *listReq.Offset
+    }
+    if listReq.UserID != nil {
+        query = query.Where("user_id = ?", *listReq.UserID)
+    }
+
+    err := query.Limit(limit).Offset(offset).Find(&subs).Error
     if err != nil {
         return nil, err
     }
@@ -78,7 +93,7 @@ func (r *subscriptionRepo) Update(id string, fields map[string]any) (*models.Sub
     return &sub, nil
 }
 
-func (r *subscriptionRepo) Sum(sumReq models.SumSubscriptionPrice) (int, error) {
+func (r *subscriptionRepo) Sum(sumReq models.SumSubscriptionPriceParams) (int, error) {
     var total int
     query := r.db.Model(&models.Subscription{}).Where("user_id = ?", sumReq.UserID)
 
