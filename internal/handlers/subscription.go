@@ -37,11 +37,11 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	var subReq models.SubscriptionCreateReq
 
 	if err := c.Bind(&subReq); err != nil {
-		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
     }
 
 	if err := validation.Validate(&subReq, new(models.TagCreate)); err != nil {
-		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
 	}
 
 	sub := models.Subscription{
@@ -57,7 +57,7 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return sendError(c, http.StatusConflict, "This subscription already exist", err.Error())
 		}
-		return sendError(c, http.StatusInternalServerError, "Couldn't create subscription record", err.Error())
+		return sendError(c, http.StatusInternalServerError, "Error creating subscription record", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
@@ -68,7 +68,7 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
-		return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid parameter", err.Error())
     }
 
 	sub, err := h.repo.Get(subId)
@@ -104,7 +104,7 @@ func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
 func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
-        return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+        return sendError(c, http.StatusBadRequest, "Invalid parameter", err.Error())
     }
 
 	if err := h.repo.Delete(subId); err != nil {
@@ -121,21 +121,21 @@ func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
 func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
-        return sendError(c, http.StatusBadRequest, "Invalid UUID format", err.Error())
+        return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
     }
 
 	var subReq models.SubscriptionUpdateReq
 	if err := c.Bind(&subReq); err != nil {
-		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
     }
 
 	fields := subReq.ToMap()
 	if len(fields) == 0 {
-		return sendError(c, http.StatusBadRequest, "Update failed", "No valid fields provided for update")
+		return sendError(c, http.StatusBadRequest, "Nothing to update", "No valid fields provided for update")
 	}
 	
 	if err := validation.Validate(&subReq, new(models.TagUpdate)); err != nil {
-		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
 	}
 
 	sub, err := h.repo.Update(subId, fields)
