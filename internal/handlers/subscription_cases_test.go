@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//TODO: refactor
 type CreateTest struct {
 	name           string
     input          models.SubscriptionCreateReq
@@ -17,6 +18,7 @@ type CreateTest struct {
     expectedBody   string
 }
 
+//TODO: refactor
 type UpdateTest struct {
 	name           	string
 	paramID			string
@@ -28,9 +30,70 @@ type UpdateTest struct {
 
 var testUUID = uuid.New().String()
 
+var SumSubscriprionPriceTests = []struct {
+    name string
+    input models.SumSubscriptionPrice
+    setupMock func(m *MockRepository)
+    expectedStatus int
+    expectedBody string
+}{
+    {
+        name: "success",
+        input: models.SumSubscriptionPrice{
+            UserID: testUUID,
+            ServiceName: "Netflix",
+			StartDate:   "01-2026",
+			EndDate:     "12-2026",
+        },
+        setupMock: func(m *MockRepository) {
+			m.On("Sum", mock.MatchedBy(func(req models.SumSubscriptionPrice) bool {
+				return req.UserID == testUUID && 
+                req.StartDate == "01-2026" && 
+                req.ServiceName == "Netflix"
+			})).Return(1200, nil)
+		},
+        expectedStatus: http.StatusOK,
+		expectedBody: `{"total":1200}`,
+    },
+    {
+        name: "invalid date format",
+		input: models.SumSubscriptionPrice{
+			UserID: testUUID,
+			StartDate: "2026-01",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		expectedBody: "Invalid parameters",
+    },
+    {
+        name: "user_id missing",
+		input: models.SumSubscriptionPrice{
+			ServiceName: "Spotify",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		expectedBody: "Invalid parameters",
+    },
+    {
+        name: "internal server error",
+        input: models.SumSubscriptionPrice{
+            UserID: testUUID,
+            ServiceName: "Netflix",
+			StartDate: "01-2026",
+			EndDate: "12-2026",
+        },
+        setupMock: func(m *MockRepository) {
+            m.On("Sum", mock.Anything).Return(0, gorm.ErrInvalidDB)
+        },
+        expectedStatus: http.StatusInternalServerError,
+        expectedBody: "Error calculating subscription sum price",
+    },
+}
+
+//TODO: refactor
 var UpdateSubscriptionTests = []UpdateTest{
 	{
-        name: "success update",
+        name: "success",
         paramID: testUUID,
         input: models.SubscriptionUpdateReq{ServiceName: new("Netflix Premium"), Price: new(500)},
         setupMock: func(m *MockRepository) {
@@ -93,7 +156,7 @@ var CreateSubscriptionTests = []CreateTest{
         expectedBody: "Netflix",
     },
     {
-        name: "validation failed - negative price",
+        name: "negative price",
         input: models.SubscriptionCreateReq{
             ServiceName: "Netflix", Price: -1, 
             UserId: testUUID, StartDate: "07-2023",
@@ -103,7 +166,7 @@ var CreateSubscriptionTests = []CreateTest{
         expectedBody: "Validation failed",
     },
 	{
-        name: "validation failed - empty name",
+        name: "empty name",
         input: models.SubscriptionCreateReq{
             ServiceName: "", Price: 300, 
             UserId: testUUID, StartDate: "07-2023",
@@ -113,7 +176,7 @@ var CreateSubscriptionTests = []CreateTest{
         expectedBody: "Validation failed",
     },
 	{
-        name: "validation failed - invalid uuid",
+        name: "invalid uuid format",
         input: models.SubscriptionCreateReq{
             ServiceName: "Netflix", Price: 300, 
             UserId: "string", StartDate: "07-2023",
@@ -123,7 +186,7 @@ var CreateSubscriptionTests = []CreateTest{
         expectedBody: "Validation failed",
     },
 	{
-        name: "validation failed - invalid date",
+        name: "invalid date format",
         input: models.SubscriptionCreateReq{
             ServiceName: "Netflix", Price: 300, 
             UserId: testUUID, StartDate: "0791832023",
