@@ -96,7 +96,7 @@ var UpdateSubscriptionTests = []struct{
         input: models.SubscriptionUpdateReq{ServiceName: new("New")},
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid UUID format",
+        expectedBody: "Invalid parameters",
     },
 	{
         name: "empty request body",
@@ -104,7 +104,7 @@ var UpdateSubscriptionTests = []struct{
         input: models.SubscriptionUpdateReq{},
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Update failed",
+        expectedBody: "Nothing to update",
     },
 	{
         name: "record not found",
