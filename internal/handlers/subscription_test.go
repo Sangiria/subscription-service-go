@@ -41,23 +41,33 @@ func (m *MockRepository) Get(id string) (*models.Subscription, error) { return n
 func (m *MockRepository) List(listReq models.ListParams) ([]models.Subscription, error) { return nil, nil }
 func (m *MockRepository) Delete(id string) error { return nil }
 
+func setupHandlerTest(setupMock func(m *MockRepository)) (*echo.Echo, *MockRepository, *httptest.ResponseRecorder) {
+    e := echo.New()
+    mockRepo := new(MockRepository)
+    if setupMock != nil {
+        setupMock(mockRepo)
+    }
+    rec := httptest.NewRecorder()
+    return e, mockRepo, rec
+}
+
+var baseRoute = "/subscriptions"
+
 func TestUpdateSubscription(t *testing.T) {
     for _, tt := range UpdateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
-            e := echo.New()
-            mockRepo := new(MockRepository)
-            tt.setupMock(mockRepo)
+            e, mockRepo, rec := setupHandlerTest(tt.setupMock)
             h := NewSubscriptionHandler(mockRepo)
 
-            e.PATCH("/subscriptions/:id", h.UpdateSubscriptions)
+            var route = baseRoute + "/:id"
 
+            e.PATCH(route, h.UpdateSubscriptions)
             body, _ := json.Marshal(tt.input)
             
-            targetURL := "/subscriptions/" + tt.paramID 
+            targetURL := baseRoute + "/" + tt.paramID
             
             req := httptest.NewRequest(http.MethodPatch, targetURL, bytes.NewReader(body))
             req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-            rec := httptest.NewRecorder()
 
             e.ServeHTTP(rec, req)
 
@@ -71,11 +81,12 @@ func TestUpdateSubscription(t *testing.T) {
 func TestSumSubscriptionPrice(t *testing.T) {
     for _, tt := range SumSubscriprionPriceTests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := echo.New()
-			mockRepo := new(MockRepository)
-			tt.setupMock(mockRepo)
+			e, mockRepo, rec := setupHandlerTest(tt.setupMock)
 			h := NewSubscriptionHandler(mockRepo)
-            e.GET("/subscriptions/sum", h.SumSubscriptionsPrice)
+
+            var route = baseRoute + "/sum"
+
+            e.GET(route, h.SumSubscriptionsPrice)
 
 			q := make(url.Values)
 
@@ -92,9 +103,8 @@ func TestSumSubscriptionPrice(t *testing.T) {
 				q.Set("end_date", tt.input.EndDate)
 			}
 
-			targetURL := fmt.Sprintf("/subscriptions/sum?%s", q.Encode())
+			targetURL := fmt.Sprintf(route + "?%s", q.Encode())
 			req := httptest.NewRequest(http.MethodGet, targetURL, nil)
-			rec := httptest.NewRecorder()
 
             e.ServeHTTP(rec, req)
 
@@ -108,18 +118,15 @@ func TestSumSubscriptionPrice(t *testing.T) {
 func TestCreateSubscription(t *testing.T) {
     for _, tt := range CreateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
-            e := echo.New()
-            mockRepo := new(MockRepository)
-            tt.setupMock(mockRepo)
+            e, mockRepo, rec := setupHandlerTest(tt.setupMock)
             h := NewSubscriptionHandler(mockRepo)
 
-            e.POST("/subscriptions", h.CreateSubscription)
+            e.POST(baseRoute, h.CreateSubscription)
 
             body, _ := json.Marshal(tt.input)
 
-            req := httptest.NewRequest(http.MethodPost, "/subscriptions", bytes.NewReader(body))
+            req := httptest.NewRequest(http.MethodPost, baseRoute, bytes.NewReader(body))
             req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-            rec := httptest.NewRecorder()
 
             e.ServeHTTP(rec, req)
 
