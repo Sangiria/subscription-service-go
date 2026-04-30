@@ -40,7 +40,7 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
     }
 
-	if err := validation.Validate(&subReq, utils.Ptr(models.TagCreate)); err != nil {
+	if err := validation.Validate(&subReq, new(models.TagCreate)); err != nil {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
 	}
 
@@ -82,9 +82,6 @@ func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 
 	return c.JSON(http.StatusOK, sub)
 }
-
-//TODO: refactor
-//TODO: add user_id query_param
 
 func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
 	var subReq models.ListParams
@@ -137,7 +134,7 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 		return sendError(c, http.StatusBadRequest, "Update failed", "No valid fields provided for update")
 	}
 	
-	if err := validation.Validate(&subReq, utils.Ptr(models.TagUpdate)); err != nil {
+	if err := validation.Validate(&subReq, new(models.TagUpdate)); err != nil {
 		return sendError(c, http.StatusBadRequest, "Validation failed", err.Error())
 	}
 
