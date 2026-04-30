@@ -25,7 +25,7 @@ type SubscriptionUpdateReq struct {
 	EndDate		*string		`json:"end_date,omitzero" update:"omitzero,datetime=01-2006"`
 }
 
-type SumSubscriptionPrice struct {
+type SumSubscriptionPriceParams struct {
 	UserID  	string			`query:"user_id" validate:"required,uuid"`
 	ServiceName string     		`query:"service_name" validate:"omitzero"`
 	StartDate   string 			`query:"start_date" validate:"omitzero,datetime=01-2006"`
@@ -42,8 +42,9 @@ type Subscription struct {
 }
 
 type ListParams struct {
-	Limit  int `validate:"gte=-1,lte=100"`
-	Offset int `validate:"gte=-1"`
+	UserID *string 	`query:"user_id" validate:"omitzero,uuid"`
+	Limit  *int 	`query:"limit" validate:"omitzero,gte=-1,lte=100"`
+	Offset *int 	`query:"offset" validate:"omitzero,gte=-1"`
 }
 
 func (req *SubscriptionUpdateReq) ToMap() map[string]any {

@@ -32,13 +32,13 @@ func (m *MockRepository) Update(id string, fields map[string]any) (*models.Subsc
     return args.Get(0).(*models.Subscription), args.Error(1)
 }
 
-func (m *MockRepository) Sum(sumReq models.SumSubscriptionPrice) (int, error) {
+func (m *MockRepository) Sum(sumReq models.SumSubscriptionPriceParams) (int, error) {
     args := m.Called(sumReq)
     return args.Int(0), args.Error(1) 
 }
 
 func (m *MockRepository) Get(id string) (*models.Subscription, error) { return nil, nil }
-func (m *MockRepository) List(limit int, offest int) ([]models.Subscription, error) { return nil, nil }
+func (m *MockRepository) List(listReq models.ListParams) ([]models.Subscription, error) { return nil, nil }
 func (m *MockRepository) Delete(id string) error { return nil }
 
 func TestUpdateSubscription(t *testing.T) {
