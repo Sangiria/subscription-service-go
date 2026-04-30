@@ -162,7 +162,7 @@ func (h *SubscriptionHandler) SumSubscriptionsPrice(c *echo.Context) error {
 
 	total, err := h.repo.Sum(subReq)
 	if err != nil {
-		return sendError(c, http.StatusInternalServerError, "Error updating subscription record", err.Error())
+		return sendError(c, http.StatusInternalServerError, "Error calculating subscription sum price", err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
