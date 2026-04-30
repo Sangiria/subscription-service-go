@@ -26,10 +26,10 @@ type SubscriptionUpdateReq struct {
 }
 
 type SumSubscriptionPrice struct {
-	UserID  	string		`validate:"required,uuid"`
-	Name    	string     	`validate:"omitzero"`
-	StartDate   string 		`validate:"omitzero,datetime=01-2006"`
-	EndDate     string 		`validate:"omitzero,datetime=01-2006"`
+	UserID  	string			`query:"user_id" validate:"required,uuid"`
+	ServiceName    	string     	`query:"service_name" validate:"omitzero"`
+	StartDate   string 			`query:"start_date" validate:"omitzero,datetime=01-2006"`
+	EndDate     string 			`query:"end_date" validate:"omitzero,datetime=01-2006"`
 }
 
 type Subscription struct {

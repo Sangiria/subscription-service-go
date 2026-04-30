@@ -83,6 +83,9 @@ func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
+//TODO: refactor
+//TODO: add user_id query_param
+
 func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
 	limit, offset := utils.ToInt(c.QueryParam("limit"), -1), utils.ToInt(c.QueryParam("offset"), -1)
 
@@ -145,4 +148,24 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, sub)
+}
+
+func (h *SubscriptionHandler) SumSubscriptionsPrice(c *echo.Context) error {
+	var subReq models.SumSubscriptionPrice
+	if err := c.Bind(&subReq); err != nil {
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
+    }
+
+	if err := validation.Validate(&subReq, nil); err != nil {
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
+	}
+
+	total, err := h.repo.Sum(subReq)
+	if err != nil {
+		return sendError(c, http.StatusInternalServerError, "Error updating subscription record", err.Error())
+	}
+
+	return c.JSON(http.StatusOK, map[string]any{
+		"total": total,
+	})
 }
