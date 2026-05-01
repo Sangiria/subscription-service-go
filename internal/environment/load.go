@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"log"
 	"log/slog"
 
 	"github.com/joho/godotenv"
@@ -11,8 +10,8 @@ func LoadEnvVariables() {
 	err := godotenv.Load(".env")
 	
 	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+		slog.Info("no .env file found, relying on system environment variables")
+    }
 
 	slog.Info("successfully loaded environment variables")
 }

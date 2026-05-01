@@ -11,7 +11,7 @@ import (
 )
 
 func InitDB() *gorm.DB {
-	db, err := gorm.Open(postgres.Open(os.Getenv("DB_DBS")), &gorm.Config{ 
+	db, err := gorm.Open(postgres.Open(os.Getenv("GOOSE_DBSTRING")), &gorm.Config{ 
 		TranslateError: true,
 		Logger: logger.Default.LogMode(logger.Info),
 	})
