@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"log/slog"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -18,6 +19,8 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		log.Fatalf("Failed to connect to database")
 	}
+
+	slog.Info("successfully connected to database")
 
 	return db
 }

@@ -2,6 +2,7 @@ package environment
 
 import (
 	"log"
+	"log/slog"
 
 	"github.com/joho/godotenv"
 )
@@ -12,4 +13,6 @@ func LoadEnvVariables() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
+
+	slog.Info("successfully loaded environment variables")
 }
