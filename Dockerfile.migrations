@@ -1,0 +1,7 @@
+FROM golang:1.26.1-alpine
+
+RUN GOSUMDB=off go install github.com/pressly/goose/v3/cmd/goose@v3.27.1
+
+WORKDIR /migrations
+
+ENTRYPOINT ["goose"]
