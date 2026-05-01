@@ -23,8 +23,8 @@ services:
       - ./migrations:/migrations
     environment:
       - GOOSE_DRIVER=${GOOSE_DRIVER}
-      - GOOSE_DBSTRING=${GOOSE_DBSTRING}
       - GOOSE_MIGRATION_DIR=${GOOSE_MIGRATION_DIR}
+      - GOOSE_DBSTRING=postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     command: up 
     depends_on:
       postgres:
