@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: subscription_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    image: pressly/goose:v3.21.1
+    container_name: migration
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      - GOOSE_DRIVER=${GOOSE_DRIVER}
+      - GOOSE_DBSTRING=${GOOSE_DBSTRING}
+      - GOOSE_MIGRATION_DIR=${GOOSE_MIGRATION_DIR}
+    command: up 
+    depends_on:
+      db:
+        condition: service_healthy
+  app:
+    build: .
+    container_name: subscription_app
+    restart: on-failure
+    environment:
+      - DATABASE_URL=${GOOSE_DBSTRING}
+    ports:
+      - "1323:1323"
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
