@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"subscription-service-go/internal/models"
+	"subscription-service-go/internal/utils"
+	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
@@ -26,12 +30,13 @@ var SumSubscriprionPriceTests = []struct {
 			EndDate:     "12-2026",
         },
         setupMock: func(m *MockRepository) {
-			m.On("Sum", mock.MatchedBy(func(req models.SumSubscriptionPriceParams) bool {
-				return req.UserID == testUUID && 
-                req.StartDate == "01-2026" && 
-                req.ServiceName == "Netflix"
-			})).Return(1200, nil)
-		},
+            m.On("Sum", models.SumSubscriptionPriceParams{
+                UserID:      testUUID,
+                ServiceName: "Netflix",
+                StartDate:   "01-2026",
+                EndDate:     "12-2026",
+            }).Return(1200, nil)
+        },
         expectedStatus: http.StatusOK,
 		expectedBody: `{"total":1200}`,
     },
@@ -76,7 +81,7 @@ var UpdateSubscriptionTests = []struct{
     input          	models.SubscriptionUpdateReq
     setupMock      	func(m *MockRepository)
     expectedStatus 	int
-    expectedBody   	string
+    checkResponse   func(t *testing.T, body []byte)
 }{
 	{
         name: "success",
@@ -85,10 +90,16 @@ var UpdateSubscriptionTests = []struct{
         setupMock: func(m *MockRepository) {
             m.On("Update", testUUID, mock.MatchedBy(func(fields map[string]any) bool {
                 return fields["service_name"] == "Netflix Premium" && fields["price"] == 500
-            })).Return(&models.Subscription{ServiceName: "Netflix Premium"}, nil)
+            })).Return(&models.Subscription{ServiceName: "Netflix Premium", Price: 500}, nil)
         },
         expectedStatus: http.StatusOK,
-        expectedBody: "Netflix Premium",
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual models.Subscription
+            err := json.Unmarshal(body, &actual)
+            assert.NoError(t, err)
+            assert.Equal(t, "Netflix Premium", actual.ServiceName)
+            assert.Equal(t, 500, actual.Price)
+        },
     },
 	{
         name: "invalid uuid format",
@@ -96,7 +107,35 @@ var UpdateSubscriptionTests = []struct{
         input: models.SubscriptionUpdateReq{ServiceName: new("New")},
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid parameters",
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "Invalid parameters", actual["message"])
+        },
+    },
+    {
+        name: "negative price",
+        paramID: testUUID,
+        input: models.SubscriptionUpdateReq{ServiceName: new("Netflix Premium"), Price: new(-500)},
+        setupMock: func(m *MockRepository) {},
+        expectedStatus: http.StatusBadRequest,
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "Invalid parameters", actual["message"])
+        },
+    },
+    {
+        name: "invalid date format",
+        paramID: testUUID,
+        input: models.SubscriptionUpdateReq{StartDate: new("2026-01")},
+        setupMock: func(m *MockRepository) {},
+        expectedStatus: http.StatusBadRequest,
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "Invalid parameters", actual["message"])
+        },
     },
 	{
         name: "empty request body",
@@ -104,7 +143,11 @@ var UpdateSubscriptionTests = []struct{
         input: models.SubscriptionUpdateReq{},
         setupMock: func(m *MockRepository) {},
         expectedStatus: http.StatusBadRequest,
-        expectedBody: "Nothing to update",
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "Nothing to update", actual["message"])
+        },
     },
 	{
         name: "record not found",
@@ -114,7 +157,11 @@ var UpdateSubscriptionTests = []struct{
             m.On("Update", testUUID, mock.Anything).Return(nil, gorm.ErrRecordNotFound)
         },
         expectedStatus: http.StatusNotFound,
-        expectedBody: "This subscription doesn't exist",
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "This subscription doesn't exist", actual["message"])
+        },
     },
 	{
         name: "internal server error",
@@ -124,91 +171,138 @@ var UpdateSubscriptionTests = []struct{
             m.On("Update", testUUID, mock.Anything).Return(nil, gorm.ErrInvalidDB)
         },
         expectedStatus: http.StatusInternalServerError,
-        expectedBody: "Error updating subscription record",
+        checkResponse: func(t *testing.T, body []byte) {
+            var actual map[string]string
+            json.Unmarshal(body, &actual)
+            assert.Equal(t, "Error updating subscription record", actual["message"])
+        },
     },
 }
 
-var CreateSubscriptionTests = []struct{
-    name           string
-    input          models.SubscriptionCreateReq
-    setupMock      func(m *MockRepository)
-    expectedStatus int
-    expectedBody   string
+var CreateSubscriptionTests = []struct {
+	name           string
+	input          models.SubscriptionCreateReq
+	setupMock      func(m *MockRepository)
+	expectedStatus int
+	checkResponse  func(t *testing.T, body []byte)
 }{
 	{
-        name: "success",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: 300, 
-            UserId: testUUID, StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {
-            m.On("Create", mock.Anything).Return(nil)
-        },
-        expectedStatus: http.StatusOK,
-        expectedBody: "Netflix",
-    },
-    {
-        name: "negative price",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: -1, 
-            UserId: testUUID, StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {},
-        expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid parameters",
-    },
+		name: "success",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: 300,
+			UserId: testUUID, StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {
+			m.On("Create", mock.MatchedBy(func(sub *models.Subscription) bool {
+				return sub.ServiceName == "Netflix" &&
+					sub.Price == 300 &&
+					sub.UserId == testUUID &&
+					sub.StartDate.Equal(*utils.ParseToDate("07-2023"))
+			})).Return(nil)
+		},
+		expectedStatus: http.StatusOK,
+		checkResponse: func(t *testing.T, body []byte) {
+			var response struct {
+				Subscription models.Subscription `json:"subscription"`
+			}
+			err := json.Unmarshal(body, &response)
+			assert.NoError(t, err)
+
+			actual := response.Subscription
+			assert.Equal(t, "Netflix", actual.ServiceName)
+			assert.Equal(t, 300, actual.Price)
+			assert.Equal(t, testUUID, actual.UserId)
+			assert.True(t, actual.StartDate.Equal(*utils.ParseToDate("07-2023"))) 
+		},
+	},
 	{
-        name: "empty name",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "", Price: 300, 
-            UserId: testUUID, StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {},
-        expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid parameters",
-    },
+		name: "negative price",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: -1,
+			UserId: testUUID, StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "Invalid parameters", actual["message"])
+		},
+	},
 	{
-        name: "invalid uuid format",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: 300, 
-            UserId: "string", StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {},
-        expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid parameters",
-    },
+		name: "empty name",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "", Price: 300,
+			UserId: testUUID, StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "Invalid parameters", actual["message"])
+		},
+	},
 	{
-        name: "invalid date format",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: 300, 
-            UserId: testUUID, StartDate: "0791832023",
-        },
-        setupMock: func(m *MockRepository) {},
-        expectedStatus: http.StatusBadRequest,
-        expectedBody: "Invalid parameters",
-    },
-    {
-        name: "conflict",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: 300, 
-            UserId: testUUID, StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {
-            m.On("Create", mock.Anything).Return(gorm.ErrDuplicatedKey)
-        },
-        expectedStatus: http.StatusConflict,
-        expectedBody: "This subscription already exist",
-    },
+		name: "invalid uuid format",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: 300,
+			UserId: "not-uuid", StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "Invalid parameters", actual["message"])
+		},
+	},
 	{
-        name: "internal server error",
-        input: models.SubscriptionCreateReq{
-            ServiceName: "Netflix", Price: 300, 
-            UserId: testUUID, StartDate: "07-2023",
-        },
-        setupMock: func(m *MockRepository) {
-            m.On("Create", mock.Anything).Return(gorm.ErrInvalidDB)
-        },
-        expectedStatus: http.StatusInternalServerError,
-        expectedBody: "Error creating subscription record",
-    },
+		name: "invalid date format",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: 300,
+			UserId: testUUID, StartDate: "0791832023",
+		},
+		setupMock: func(m *MockRepository) {},
+		expectedStatus: http.StatusBadRequest,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "Invalid parameters", actual["message"])
+		},
+	},
+	{
+		name: "conflict",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: 300,
+			UserId: testUUID, StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {
+			m.On("Create", mock.MatchedBy(func(sub *models.Subscription) bool {
+				return sub.ServiceName == "Netflix"
+			})).Return(gorm.ErrDuplicatedKey)
+		},
+		expectedStatus: http.StatusConflict,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "This subscription already exist", actual["message"])
+		},
+	},
+	{
+		name: "internal server error",
+		input: models.SubscriptionCreateReq{
+			ServiceName: "Netflix", Price: 300,
+			UserId: testUUID, StartDate: "07-2023",
+		},
+		setupMock: func(m *MockRepository) {
+			m.On("Create", mock.Anything).Return(gorm.ErrInvalidDB)
+		},
+		expectedStatus: http.StatusInternalServerError,
+		checkResponse: func(t *testing.T, body []byte) {
+			var actual map[string]string
+			json.Unmarshal(body, &actual)
+			assert.Equal(t, "Error creating subscription record", actual["message"])
+		},
+	},
 }
