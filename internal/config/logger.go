@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 )
 
-func GetRequestLoggerConfig(logger *slog.Logger) middleware.RequestLoggerConfig {
+func GetRequestLoggerConfig() middleware.RequestLoggerConfig {
     return middleware.RequestLoggerConfig{
         LogStatus:   true,
         LogURI:      true,
@@ -23,10 +23,10 @@ func GetRequestLoggerConfig(logger *slog.Logger) middleware.RequestLoggerConfig 
 
             if v.Error != nil {
                 attrs = append(attrs, slog.String("err", v.Error.Error()))
-                logger.LogAttrs(c.Request().Context(), slog.LevelError, "request failed", attrs...)
+                slog.LogAttrs(c.Request().Context(), slog.LevelError, "request failed", attrs...)
             } else {
                 attrs = append(attrs, slog.Duration("latency", v.Latency))
-                logger.LogAttrs(c.Request().Context(), slog.LevelInfo, "request processed", attrs...)
+                slog.LogAttrs(c.Request().Context(), slog.LevelInfo, "request processed", attrs...)
             }
 
             return nil

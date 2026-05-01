@@ -67,7 +67,7 @@ func TestUpdateSubscription(t *testing.T) {
     for _, tt := range UpdateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
             e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-            h := NewSubscriptionHandler(mockRepo, logger)
+            h := NewSubscriptionHandler(mockRepo)
 
             var route = baseRoute + "/:id"
 
@@ -96,7 +96,7 @@ func TestSumSubscriptionPrice(t *testing.T) {
     for _, tt := range SumSubscriprionPriceTests {
 		t.Run(tt.name, func(t *testing.T) {
 			e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-			h := NewSubscriptionHandler(mockRepo, logger)
+			h := NewSubscriptionHandler(mockRepo)
 
             var route = baseRoute + "/sum"
 
@@ -133,7 +133,7 @@ func TestCreateSubscription(t *testing.T) {
     for _, tt := range CreateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
             e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-            h := NewSubscriptionHandler(mockRepo, logger)
+            h := NewSubscriptionHandler(mockRepo)
 
             e.POST(baseRoute, h.CreateSubscription)
 
