@@ -3,7 +3,7 @@ package routes
 import (
 	"subscription-service-go/internal/handlers"
 
-	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v4"
 )
 
 func InitSubscriptionRoutes(e *echo.Echo, h *handlers.SubscriptionHandler) {

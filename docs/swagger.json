@@ -1,0 +1,14 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a documentation for subscription service API",
+        "title": "Subscription Service API",
+        "contact": {
+            "email": "lisaosadchenko@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:1323",
+    "basePath": "/",
+    "paths": {}
+}
