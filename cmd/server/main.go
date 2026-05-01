@@ -15,12 +15,15 @@ import (
 )
 
 func main(){
-	environment.LoadEnvVariables()
-	db := database.InitDB()
-	repo := repository.NewRepository(db)
-	
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
+	environment.LoadEnvVariables()
+	db := database.InitDB()
+
+	logger.Info("successfully connected to database")
+
+	repo := repository.NewRepository(db)
+	
 	e := echo.New()
 	e.Use(middleware.RequestLoggerWithConfig(config.GetRequestLoggerConfig(logger)))
 	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(repo, logger))
