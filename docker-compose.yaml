@@ -34,7 +34,7 @@ services:
     container_name: subscription_app
     restart: on-failure
     environment:
-      - DATABASE_URL=${GOOSE_DBSTRING}
+      - GOOSE_DBSTRING=${GOOSE_DBSTRING}
     ports:
       - "1323:1323"
     depends_on:
