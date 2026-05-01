@@ -23,7 +23,7 @@ func main(){
 
 	e := echo.New()
 	e.Use(middleware.RequestLoggerWithConfig(config.GetRequestLoggerConfig(logger)))
-	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(repo))
+	routes.InitSubscriptionRoutes(e, handlers.NewSubscriptionHandler(repo, logger))
 
 	if err := e.Start(":1323"); err != nil {
 		e.Logger.Error("failed to start server", "error", err)

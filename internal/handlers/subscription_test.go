@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"subscription-service-go/internal/models"
 	"testing"
 
@@ -14,6 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+var logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 type MockRepository struct {
     mock.Mock
@@ -63,7 +67,7 @@ func TestUpdateSubscription(t *testing.T) {
     for _, tt := range UpdateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
             e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-            h := NewSubscriptionHandler(mockRepo)
+            h := NewSubscriptionHandler(mockRepo, logger)
 
             var route = baseRoute + "/:id"
 
@@ -92,7 +96,7 @@ func TestSumSubscriptionPrice(t *testing.T) {
     for _, tt := range SumSubscriprionPriceTests {
 		t.Run(tt.name, func(t *testing.T) {
 			e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-			h := NewSubscriptionHandler(mockRepo)
+			h := NewSubscriptionHandler(mockRepo, logger)
 
             var route = baseRoute + "/sum"
 
@@ -129,7 +133,7 @@ func TestCreateSubscription(t *testing.T) {
     for _, tt := range CreateSubscriptionTests {
         t.Run(tt.name, func(t *testing.T) {
             e, mockRepo, rec := setupHandlerTest(tt.setupMock)
-            h := NewSubscriptionHandler(mockRepo)
+            h := NewSubscriptionHandler(mockRepo, logger)
 
             e.POST(baseRoute, h.CreateSubscription)
 
