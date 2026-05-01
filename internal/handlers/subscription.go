@@ -10,7 +10,7 @@ import (
 	"subscription-service-go/internal/validation"
 
 	"github.com/google/uuid"
-	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,7 @@ type apiError struct {
 	Details string `json:"details,omitzero"`
 }
 
-func sendError(c *echo.Context, code int, msg string, details string) error {
+func sendError(c echo.Context, code int, msg string, details string) error {
 	return c.JSON(code, apiError{
 		Message: msg,
 		Details: details,
@@ -34,7 +34,7 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 	return &SubscriptionHandler{repo: repo}
 }
 
-func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
+func (h *SubscriptionHandler) CreateSubscription(c echo.Context) error {
 	var subReq models.SubscriptionCreateReq
 
 	if err := c.Bind(&subReq); err != nil {
@@ -86,7 +86,7 @@ func (h *SubscriptionHandler) CreateSubscription(c *echo.Context) error {
 	})
 }
 
-func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
+func (h *SubscriptionHandler) GetSubscription(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
 		slog.Error("failed to validate id parameter", "error", err)
@@ -115,7 +115,7 @@ func (h *SubscriptionHandler) GetSubscription(c *echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
-func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
+func (h *SubscriptionHandler) ListSubscriptions(c echo.Context) error {
 	var subReq models.ListParams
 	if err := c.Bind(&subReq); err != nil {
 		slog.Error("failed to bind list parameters", "error", err)
@@ -143,7 +143,7 @@ func (h *SubscriptionHandler) ListSubscriptions(c *echo.Context) error {
 	return c.JSON(http.StatusOK, subs)
 }
 
-func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
+func (h *SubscriptionHandler) DeleteSubscriptions(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
 		slog.Error("failed to validate id parameter", "error", err)
@@ -164,7 +164,7 @@ func (h *SubscriptionHandler) DeleteSubscriptions(c *echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
+func (h *SubscriptionHandler) UpdateSubscriptions(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
 		slog.Error("failed to validate id parameter", "error", err)
@@ -209,7 +209,7 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
-func (h *SubscriptionHandler) SumSubscriptionsPrice(c *echo.Context) error {
+func (h *SubscriptionHandler) SumSubscriptionsPrice(c echo.Context) error {
 	var subReq models.SumSubscriptionPriceParams
 	if err := c.Bind(&subReq); err != nil {
 		slog.Error("failed to bind sum data", "error", err)

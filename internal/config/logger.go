@@ -3,8 +3,8 @@ package config
 import (
 	"log/slog"
 
-	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func GetRequestLoggerConfig() middleware.RequestLoggerConfig {
@@ -14,7 +14,7 @@ func GetRequestLoggerConfig() middleware.RequestLoggerConfig {
         LogMethod:   true,
         LogLatency:  true,
         HandleError: true,
-        LogValuesFunc: func(c *echo.Context, v middleware.RequestLoggerValues) error {
+        LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
             attrs := []slog.Attr{
                 slog.String("method", v.Method),
                 slog.String("uri", v.URI),

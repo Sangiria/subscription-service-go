@@ -1,0 +1,10 @@
+basePath: /
+host: localhost:1323
+info:
+  contact:
+    email: lisaosadchenko@gmail.com
+  description: This is a documentation for subscription service API
+  title: Subscription Service API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
