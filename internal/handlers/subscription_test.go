@@ -78,7 +78,11 @@ func TestUpdateSubscription(t *testing.T) {
             e.ServeHTTP(rec, req)
 
             assert.Equal(t, tt.expectedStatus, rec.Code)
-            assert.Contains(t, rec.Body.String(), tt.expectedBody)
+
+            if tt.checkResponse != nil {
+                tt.checkResponse(t, rec.Body.Bytes())
+            }
+
             mockRepo.AssertExpectations(t)
         })
     }
@@ -137,7 +141,11 @@ func TestCreateSubscription(t *testing.T) {
             e.ServeHTTP(rec, req)
 
             assert.Equal(t, tt.expectedStatus, rec.Code)
-            assert.Contains(t, rec.Body.String(), tt.expectedBody)
+
+            if tt.checkResponse != nil {
+                tt.checkResponse(t, rec.Body.Bytes())
+            }
+
             mockRepo.AssertExpectations(t)
         })
     }

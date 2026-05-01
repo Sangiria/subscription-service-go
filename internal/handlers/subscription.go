@@ -129,15 +129,16 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c *echo.Context) error {
 		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
     }
 
+	
+	if err := validation.Validate(&subReq, new(models.TagUpdate)); err != nil {
+		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
+	}
+	
 	fields := subReq.ToMap()
 	if len(fields) == 0 {
 		return sendError(c, http.StatusBadRequest, "Nothing to update", "No valid fields provided for update")
 	}
 	
-	if err := validation.Validate(&subReq, new(models.TagUpdate)); err != nil {
-		return sendError(c, http.StatusBadRequest, "Invalid parameters", err.Error())
-	}
-
 	sub, err := h.repo.Update(subId, fields)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
