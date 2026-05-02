@@ -127,6 +127,36 @@ paths:
       tags:
       - subscriptions
   /subscriptions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a single subscription record by its ID
+      parameters:
+      - description: Subscription ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted
+        "400":
+          description: Invalid parameter
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "404":
+          description: This subscription doesn't exist
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+      summary: Delete subscription record
+      tags:
+      - subscriptions
     get:
       consumes:
       - application/json
