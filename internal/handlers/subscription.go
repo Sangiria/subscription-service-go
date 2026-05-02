@@ -175,6 +175,17 @@ func (h *SubscriptionHandler) ListSubscriptions(c echo.Context) error {
 	return c.JSON(http.StatusOK, subs)
 }
 
+// @Summary         Delete subscription record
+// @Description     Delete a single subscription record by its ID
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           id           path      string  true  "Subscription ID (UUID)"
+// @Success         200          "Successfully deleted"
+// @Failure         400          {object}  handlers.apiError "Invalid parameter"
+// @Failure         404          {object}  handlers.apiError "This subscription doesn't exist"
+// @Failure         500          {object}  handlers.apiError "Internal server error"
+// @Router          /subscriptions/{id} [delete]
 func (h *SubscriptionHandler) DeleteSubscriptions(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {

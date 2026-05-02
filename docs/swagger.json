@@ -173,6 +173,51 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Delete a single subscription record by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Delete subscription record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted"
+                    },
+                    "400": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "404": {
+                        "description": "This subscription doesn't exist",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    }
+                }
             }
         }
     },
