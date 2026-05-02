@@ -1,10 +1,12 @@
-PHONY: run build up down
+.PHONY: docker-build docker-up docker-down run-local test
 
-run:
+run-local:
 	go run cmd/server/main.go
-build:
+docker-build:
 	docker compose up --build
-up:
+docker-up:
 	docker compose up
-down:
+docker-down:
 	docker compose down
+test:
+	go test -v ./internal/handlers

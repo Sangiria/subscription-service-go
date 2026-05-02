@@ -34,7 +34,7 @@ services:
     container_name: subscription_app
     restart: on-failure
     environment:
-      - GOOSE_DBSTRING=${GOOSE_DBSTRING}
+      - GOOSE_DBSTRING=postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     ports:
       - "1323:1323"
     depends_on:
