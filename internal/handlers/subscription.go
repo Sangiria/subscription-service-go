@@ -35,7 +35,7 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 }
 
 // @Summary         Create subscription record
-// @Description     Create a subscription record based on provided params
+// @Description     Create a subscription record based on provided data
 // @Tags            subscriptions
 // @Accept          json
 // @Produce         json
@@ -207,6 +207,18 @@ func (h *SubscriptionHandler) DeleteSubscriptions(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// @Summary         Update subscription record
+// @Description     Update an existing subscription by its ID using partial data
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           id           path      string                        true  "Subscription ID (UUID)"
+// @Param           request      body      models.SubscriptionUpdateReq  true  "Fields to update"
+// @Success         200          {object}  models.Subscription "Successfully updated"
+// @Failure         400          {object}  handlers.apiError "Invalid parameters / Nothing to update"
+// @Failure         404          {object}  handlers.apiError "This subscription doesn't exist"
+// @Failure         500          {object}  handlers.apiError "Internal server error"
+// @Router          /subscriptions/{id} [patch]
 func (h *SubscriptionHandler) UpdateSubscriptions(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {

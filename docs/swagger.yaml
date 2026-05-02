@@ -42,6 +42,17 @@ definitions:
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
     type: object
+  models.SubscriptionUpdateReq:
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+    type: object
 host: localhost:1323
 info:
   contact:
@@ -94,7 +105,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a subscription record based on provided params
+      description: Create a subscription record based on provided data
       parameters:
       - description: Subscription details
         in: body
@@ -187,6 +198,44 @@ paths:
           schema:
             $ref: '#/definitions/handlers.apiError'
       summary: Get subscription record
+      tags:
+      - subscriptions
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing subscription by its ID using partial data
+      parameters:
+      - description: Subscription ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SubscriptionUpdateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated
+          schema:
+            $ref: '#/definitions/models.Subscription'
+        "400":
+          description: Invalid parameters / Nothing to update
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "404":
+          description: This subscription doesn't exist
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+      summary: Update subscription record
       tags:
       - subscriptions
 swagger: "2.0"
