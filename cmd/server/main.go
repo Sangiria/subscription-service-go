@@ -22,7 +22,6 @@ import (
 // @contact.email lisaosadchenko@gmail.com
 // @host localhost:1323
 // @BasePath /
-
 func main(){
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)

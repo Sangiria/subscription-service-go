@@ -34,6 +34,17 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 	return &SubscriptionHandler{repo: repo}
 }
 
+// @Summary         Create subscription record
+// @Description     Creating a user's subscription record based on provided params
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           request      body      models.SubscriptionCreateReq  true  "Subscription details"
+// @Success         200          {object}  map[string]models.Subscription "Successfully created"
+// @Failure         400          {object}  apiError "Invalid parameters"
+// @Failure         409          {object}  apiError "Subscription already exists"
+// @Failure         500          {object}  apiError"Internal server error"
+// @Router          /subscriptions [post]
 func (h *SubscriptionHandler) CreateSubscription(c echo.Context) error {
 	var subReq models.SubscriptionCreateReq
 

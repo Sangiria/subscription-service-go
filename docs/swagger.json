@@ -10,5 +10,124 @@
     },
     "host": "localhost:1323",
     "basePath": "/",
-    "paths": {}
+    "paths": {
+        "/subscriptions": {
+            "post": {
+                "description": "Creating a user's subscription record based on provided params",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Create subscription record",
+                "parameters": [
+                    {
+                        "description": "Subscription details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SubscriptionCreateReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/models.Subscription"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "409": {
+                        "description": "Subscription already exists",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.apiError": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Subscription": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "2027-05-02T16:21:19Z"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2026-05-02T16:21:19Z"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SubscriptionCreateReq": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string",
+                    "example": "10-2024"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 1200
+                },
+                "service_name": {
+                    "type": "string",
+                    "example": "YandexMusic"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "10-2023"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                }
+            }
+        }
+    }
 }

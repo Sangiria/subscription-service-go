@@ -11,11 +11,11 @@ const (
 )
 
 type SubscriptionCreateReq struct {
-	ServiceName string 		`json:"service_name" create:"required" update:"omitzero"`
-	Price		int			`json:"price" create:"required,gt=-1" update:"omitzero,gt=-1"`
-	UserId		string		`json:"user_id" create:"required,uuid"`
-	StartDate	string		`json:"start_date" create:"required,datetime=01-2006" update:"omitzero,datetime=01-2006"`
-	EndDate		string		`json:"end_date,omitzero" create:"omitzero,datetime=01-2006" update:"omitzero,datetime=01-2006"`
+	ServiceName string 		`json:"service_name" example:"YandexMusic" create:"required" update:"omitzero"`
+	Price		int			`json:"price" example:"1200" create:"required,gt=-1" update:"omitzero,gt=-1"`
+	UserId		string		`json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" create:"required,uuid"`
+	StartDate	string		`json:"start_date" example:"10-2023" create:"required,datetime=01-2006" update:"omitzero,datetime=01-2006"`
+	EndDate		string		`json:"end_date,omitzero" example:"10-2024" create:"omitzero,datetime=01-2006" update:"omitzero,datetime=01-2006"`
 }
 
 type SubscriptionUpdateReq struct {
@@ -37,8 +37,8 @@ type Subscription struct {
 	ServiceName string 			`json:"service_name"`
 	Price		int				`json:"price"`
 	UserId		string			`json:"user_id"`
-	StartDate	time.Time		`json:"start_date"`
-	EndDate		*time.Time		`json:"end_date,omitzero"`
+	StartDate	time.Time		`json:"start_date" swaggertype:"string" example:"2026-05-02T16:21:19Z"`
+	EndDate		*time.Time		`json:"end_date,omitzero" swaggertype:"string" example:"2027-05-02T16:21:19Z"`
 }
 
 type ListParams struct {
