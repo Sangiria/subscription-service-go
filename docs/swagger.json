@@ -125,6 +125,71 @@
                 }
             }
         },
+        "/subscriptions/sum": {
+            "get": {
+                "description": "Get the sum of prices for subscriptions based on filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Calculate total subscriptions price",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "10-2024",
+                        "name": "endDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "YandexMusic",
+                        "name": "serviceName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "10-2023",
+                        "name": "startDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
+                        "name": "userID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully calculated total sum",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    }
+                }
+            }
+        },
         "/subscriptions/{id}": {
             "get": {
                 "description": "Get a single subscription record by its ID",
