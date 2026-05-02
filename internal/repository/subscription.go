@@ -110,7 +110,7 @@ func (r *subscriptionRepo) Sum(sumReq models.SumSubscriptionPriceParams) (int, e
         query = query.Where("start_date <= ?", *endDateTime)
     }
 
-    if err := query.Select("SUM(price)").Scan(&total).Error; err != nil {
+    if err := query.Select("COALESCE(SUM(price), 0)").Scan(&total).Error; err != nil {
         return 0, err
     }
 
