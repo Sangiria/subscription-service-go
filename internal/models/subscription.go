@@ -13,7 +13,7 @@ const (
 type SubscriptionCreateReq struct {
 	ServiceName string 		`json:"service_name" example:"YandexMusic" create:"required" update:"omitzero"`
 	Price		int			`json:"price" example:"1200" create:"required,gt=-1" update:"omitzero,gt=-1"`
-	UserId		string		`json:"user_id" example:"м" create:"required,uuid"`
+	UserId		string		`json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" create:"required,uuid"`
 	StartDate	string		`json:"start_date" example:"10-2023" create:"required,datetime=01-2006" update:"omitzero,datetime=01-2006"`
 	EndDate		string		`json:"end_date,omitzero" example:"10-2024" create:"omitzero,datetime=01-2006" update:"omitzero,datetime=01-2006"`
 }
@@ -42,9 +42,9 @@ type Subscription struct {
 }
 
 type ListParams struct {
-	UserID *string 	`query:"user_id" validate:"omitzero,uuid"`
-	Limit  *int 	`query:"limit" validate:"omitzero,gte=-1,lte=100"`
-	Offset *int 	`query:"offset" validate:"omitzero,gte=-1"`
+	UserID *string 	`query:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" validate:"omitzero,uuid"`
+	Limit  *int 	`query:"limit" example:"10" validate:"omitzero,gte=-1,lte=100"`
+	Offset *int 	`query:"offset" example:"5" validate:"omitzero,gte=-1"`
 }
 
 func (req *SubscriptionUpdateReq) ToMap() map[string]any {

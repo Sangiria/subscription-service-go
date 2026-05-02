@@ -137,6 +137,16 @@ func (h *SubscriptionHandler) GetSubscription(c echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
+// @Summary         List subscription records
+// @Description     Get a list of subscriptions with optional filtering and pagination
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           query        query     models.ListParams false "Filter and pagination parameters"
+// @Success         200          {array}   models.Subscription "Successfully fetched list"
+// @Failure         400          {object}  handlers.apiError "Invalid parameters"
+// @Failure         500          {object}  handlers.apiError "Internal server error"
+// @Router          /subscriptions [get]
 func (h *SubscriptionHandler) ListSubscriptions(c echo.Context) error {
 	var subReq models.ListParams
 	if err := c.Bind(&subReq); err != nil {

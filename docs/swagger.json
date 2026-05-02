@@ -12,8 +12,67 @@
     "basePath": "/",
     "paths": {
         "/subscriptions": {
+            "get": {
+                "description": "Get a list of subscriptions with optional filtering and pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "List subscription records",
+                "parameters": [
+                    {
+                        "maximum": 100,
+                        "minimum": -1,
+                        "type": "integer",
+                        "example": 10,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": -1,
+                        "type": "integer",
+                        "example": 5,
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "550e8400-e29b-41d4-a716-446655440000",
+                        "name": "userID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully fetched list",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Subscription"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Creating a subscription record based on provided params",
+                "description": "Create a subscription record based on provided params",
                 "consumes": [
                     "application/json"
                 ],

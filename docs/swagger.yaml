@@ -51,10 +51,50 @@ info:
   version: "1.0"
 paths:
   /subscriptions:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of subscriptions with optional filtering and pagination
+      parameters:
+      - example: 10
+        in: query
+        maximum: 100
+        minimum: -1
+        name: limit
+        type: integer
+      - example: 5
+        in: query
+        minimum: -1
+        name: offset
+        type: integer
+      - example: 550e8400-e29b-41d4-a716-446655440000
+        in: query
+        name: userID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched list
+          schema:
+            items:
+              $ref: '#/definitions/models.Subscription'
+            type: array
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+      summary: List subscription records
+      tags:
+      - subscriptions
     post:
       consumes:
       - application/json
-      description: Creating a subscription record based on provided params
+      description: Create a subscription record based on provided params
       parameters:
       - description: Subscription details
         in: body
