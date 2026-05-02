@@ -1,23 +1,34 @@
 package database
 
 import (
-	"log"
 	"log/slog"
 	"os"
-
+	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+)
+
+var db_logger = slogGorm.New(
+    slogGorm.WithHandler(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+    	ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+        	if a.Key == "file" {
+            	return slog.Attr{} 
+        	}
+        	return a
+    	},
+	})), 
+    slogGorm.WithTraceAll(),
 )
 
 func InitDB() *gorm.DB {
 	db, err := gorm.Open(postgres.Open(os.Getenv("GOOSE_DBSTRING")), &gorm.Config{ 
 		TranslateError: true,
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: db_logger,
 	})
 
 	if err != nil {
-		log.Fatalf("Failed to connect to database")
+		slog.Error("Failed to connect to database", "error", err)
+    	os.Exit(1)
 	}
 
 	slog.Info("successfully connected to database")
