@@ -13,7 +13,7 @@ const (
 type SubscriptionCreateReq struct {
 	ServiceName string 		`json:"service_name" example:"YandexMusic" create:"required" update:"omitzero"`
 	Price		int			`json:"price" example:"1200" create:"required,gt=-1" update:"omitzero,gt=-1"`
-	UserId		string		`json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" create:"required,uuid"`
+	UserId		string		`json:"user_id" example:"м" create:"required,uuid"`
 	StartDate	string		`json:"start_date" example:"10-2023" create:"required,datetime=01-2006" update:"omitzero,datetime=01-2006"`
 	EndDate		string		`json:"end_date,omitzero" example:"10-2024" create:"omitzero,datetime=01-2006" update:"omitzero,datetime=01-2006"`
 }

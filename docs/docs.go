@@ -19,7 +19,7 @@ const docTemplate = `{
     "paths": {
         "/subscriptions": {
             "post": {
-                "description": "Creating a user's subscription record based on provided params",
+                "description": "Creating a subscription record based on provided params",
                 "consumes": [
                     "application/json"
                 ],
@@ -59,6 +59,56 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Subscription already exists",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscriptions/{id}": {
+            "get": {
+                "description": "Get a single subscription record by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Get subscription record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully fetched",
+                        "schema": {
+                            "$ref": "#/definitions/models.Subscription"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.apiError"
+                        }
+                    },
+                    "404": {
+                        "description": "This subscription doesn't exist",
                         "schema": {
                             "$ref": "#/definitions/handlers.apiError"
                         }

@@ -35,7 +35,7 @@ func NewSubscriptionHandler(repo repository.Repository) *SubscriptionHandler {
 }
 
 // @Summary         Create subscription record
-// @Description     Creating a user's subscription record based on provided params
+// @Description     Create a subscription record based on provided params
 // @Tags            subscriptions
 // @Accept          json
 // @Produce         json
@@ -97,6 +97,17 @@ func (h *SubscriptionHandler) CreateSubscription(c echo.Context) error {
 	})
 }
 
+// @Summary         Get subscription record
+// @Description     Get a single subscription record by its ID
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           id           path      string  true  "Subscription ID (UUID)"
+// @Success         200          {object}  models.Subscription "Successfully fetched"
+// @Failure         400          {object}  handlers.apiError "Invalid parameter"
+// @Failure         404          {object}  handlers.apiError "This subscription doesn't exist"
+// @Failure         500          {object}  handlers.apiError "Internal server error"
+// @Router          /subscriptions/{id} [get]
 func (h *SubscriptionHandler) GetSubscription(c echo.Context) error {
 	subId := c.Param("id")
 	if _, err := uuid.Parse(subId); err != nil {
