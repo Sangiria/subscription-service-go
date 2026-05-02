@@ -26,10 +26,10 @@ type SubscriptionUpdateReq struct {
 }
 
 type SumSubscriptionPriceParams struct {
-	UserID  	string			`query:"user_id" validate:"required,uuid"`
-	ServiceName string     		`query:"service_name" validate:"omitzero"`
-	StartDate   string 			`query:"start_date" validate:"omitzero,datetime=01-2006"`
-	EndDate     string 			`query:"end_date" validate:"omitzero,datetime=01-2006"`
+	UserID  	string			`query:"user_id" example:"550e8400-e29b-41d4-a716-446655440000" validate:"required,uuid"`
+	ServiceName string     		`query:"service_name" example:"YandexMusic" validate:"omitzero"`
+	StartDate   string 			`query:"start_date" example:"10-2023" validate:"omitzero,datetime=01-2006"`
+	EndDate     string 			`query:"end_date" example:"10-2024" validate:"omitzero,datetime=01-2006"`
 }
 
 type Subscription struct {

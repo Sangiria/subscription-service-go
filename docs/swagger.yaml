@@ -238,4 +238,47 @@ paths:
       summary: Update subscription record
       tags:
       - subscriptions
+  /subscriptions/sum:
+    get:
+      consumes:
+      - application/json
+      description: Get the sum of prices for subscriptions based on filters
+      parameters:
+      - example: 10-2024
+        in: query
+        name: endDate
+        type: string
+      - example: YandexMusic
+        in: query
+        name: serviceName
+        type: string
+      - example: 10-2023
+        in: query
+        name: startDate
+        type: string
+      - example: 550e8400-e29b-41d4-a716-446655440000
+        in: query
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully calculated total sum
+          schema:
+            additionalProperties:
+              type: number
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.apiError'
+      summary: Calculate total subscriptions price
+      tags:
+      - subscriptions
 swagger: "2.0"

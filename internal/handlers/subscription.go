@@ -264,6 +264,16 @@ func (h *SubscriptionHandler) UpdateSubscriptions(c echo.Context) error {
 	return c.JSON(http.StatusOK, sub)
 }
 
+// @Summary         Calculate total subscriptions price
+// @Description     Get the sum of prices for subscriptions based on filters
+// @Tags            subscriptions
+// @Accept          json
+// @Produce         json
+// @Param           query        query     models.SumSubscriptionPriceParams false "Filters for sum calculation"
+// @Success         200          {object}  map[string]number "Successfully calculated total sum"
+// @Failure         400          {object}  handlers.apiError "Invalid parameters"
+// @Failure         500          {object}  handlers.apiError "Internal server error"
+// @Router          /subscriptions/sum [get]
 func (h *SubscriptionHandler) SumSubscriptionsPrice(c echo.Context) error {
 	var subReq models.SumSubscriptionPriceParams
 	if err := c.Bind(&subReq); err != nil {
